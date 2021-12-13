@@ -1,38 +1,99 @@
-.App {
-  text-align: center;
+html, body {
+  min-height: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.app-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-template-areas: "nav main";
+}
+.nav {
+  height: 100vh;
+  grid-area: nav;
+  background-color:#EEE;
+  padding: 0;
+  display: grid; 
+  grid-template-columns: 1fr; 
+  grid-template-rows: 1fr 110px; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "nav-content"
+    "account"; 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.nav-content { grid-area: nav-content; }
+.account { 
+  grid-area: account; 
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 10px 20px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.main {
+  grid-area: main;
+}
+
+.nav-items {
+  list-style: none;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.nav-items li {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 3px 25px;
+  cursor: pointer;
+}
+
+.nav-items.disabled li {
+  opacity: 0.5;
+}
+
+.nav-items.disabled:hover, .nav-items.disabled li:hover {
+  cursor:not-allowed;
+}
+
+.nav-items li:hover {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+.compose-button {
+  margin: 0px 25px;
+}
+
+.nav-title {
+  margin: 20px 25px;
+}
+
+.login-message {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  text-align: center;
+  font-size: small;
 }
 
-.App-link {
-  color: #61dafb;
+.login-message button {
+  margin-top: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.main-login-message {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lia {
+  font-size: small;
+  line-break: loose;
 }
