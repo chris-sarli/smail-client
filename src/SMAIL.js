@@ -207,4 +207,4 @@ const SMAIL = {
 
 }
 
-export default SMAIL;
+module.exports = { SMAIL };
