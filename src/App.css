@@ -14,6 +14,7 @@ html, body {
   height: 100vh;
   grid-area: nav;
   background-color:#EEE;
+  border-right: 1px solid #DDD;
   padding: 0;
   display: grid; 
   grid-template-columns: 1fr; 
@@ -35,6 +36,7 @@ html, body {
 
 .main {
   grid-area: main;
+  overflow-y: 100vh;
 }
 
 .nav-items {
@@ -96,4 +98,117 @@ html, body {
 .lia {
   font-size: small;
   line-break: loose;
+}
+
+a {
+  color: unset;
+  text-decoration: unset;
+}
+
+.msg-item-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+}
+
+.msg-item-row.header {
+  font-weight: bold;
+  background-color: #EEE;
+  border-bottom: 1px solid #DDD;
+}
+
+.msg-item-row:not(.header):hover {
+  background-color: rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+}
+
+.msg-item-row .from,.subject {
+  text-align: left;
+}
+
+.msg-item-row .from {
+  width: 300px;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.msg-item-row .timestamp {
+  width: 100px;
+}
+
+.msg-item-row :not(.subject) {
+  flex-grow: 0;
+}
+
+.msg-item-row .subject {
+  width: 500px;
+  flex-grow: 100;
+  max-width: 600px;
+}
+
+.msg-item-row .actions {
+  opacity: 0;
+  width: 120px;
+}
+
+.msg-item-row:hover .actions {
+  opacity: 1;
+}
+
+
+.messageView {
+  display: grid; 
+  grid-template-columns: 1fr; 
+  grid-template-rows: min-content 1fr; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "header-area"
+    "body-area";
+  max-height: 100vh;
+}
+
+.messageView div {
+  padding-left: 30px; padding-right: 30px;
+}
+
+.messageView .header { 
+  grid-area: header-area;
+  background-color: #F6F6F6;
+  border-bottom: 3px dashed #DDD;
+  padding-bottom: 15px;
+}
+.messageView .body { grid-area: body-area;
+  overflow-y: scroll;
+}
+
+.dir-view {
+  display: grid; 
+  grid-template-columns: 1fr; 
+  grid-template-rows: 1fr min-content; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "message-table"
+    "status-bar"; 
+    height: 100%;
+}
+.message-table {
+  grid-area: message-table;
+  overflow-y: scroll;
+}
+.status-bar {
+  grid-area: status-bar;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: #F6F6F6;
+  border-top: 2px dashed #DDD;
+  padding: 7px 10px;
+}
+
+.status-bar .msg-count {
+  margin-right: 7px;
 }
