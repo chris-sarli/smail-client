@@ -33,7 +33,7 @@ function formatSingleFrom(from) {
 
 function formatTimestamp(timestamp) {
     const dt = new Date(timestamp);
-    return dt.toLocaleString();
+    return dt.toLocaleString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 

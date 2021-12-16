@@ -113,6 +113,10 @@ a {
   padding: 5px 10px;
 }
 
+.msg-item-row.unread {
+  font-weight: bold;
+}
+
 .msg-item-row.header {
   font-weight: bold;
   background-color: #EEE;
@@ -122,6 +126,15 @@ a {
 .msg-item-row:not(.header):hover {
   background-color: rgba(0, 0, 0, 0.07);
   cursor: pointer;
+}
+
+.msg-item-row .read-indicator {
+  width: 50px;
+  opacity: 0;
+}
+
+.msg-item-row.unread .read-indicator {
+  opacity: 1;
 }
 
 .msg-item-row .from,.subject {
@@ -151,10 +164,11 @@ a {
 
 .msg-item-row .actions {
   opacity: 0;
-  width: 120px;
+  width: 110px;
+  text-align: right;
 }
 
-.msg-item-row:hover .actions {
+.msg-item-row:hover .actions, .msg-item-row:hover .read-indicator {
   opacity: 1;
 }
 

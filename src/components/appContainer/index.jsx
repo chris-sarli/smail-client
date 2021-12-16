@@ -3,7 +3,7 @@ import { useSession, SessionProvider, LoginButton, LogoutButton, LinkButton, use
 import { getThingAll, getFile, getStringNoLocale, getThing, getSolidDataset } from "@inrupt/solid-client";
 import { useState, useEffect } from "react";
 import DirListComponent from "../dirList";
-import { BrowserRouter, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import MessageView from "../messageView";
 import Composer from "../composer";
 
@@ -18,12 +18,11 @@ function AppContainer({ children }) {
 
     const loggedIn = session.info.isLoggedIn;
 
-    const base = loggedIn ? session.info.webId.slice(0, session.info.webId.length - "profile/card#me".length) : "";
-    const inboxIri = base + "smail/inbox/";
-    const outboxIri = base + "smail/outbox/";
-
-    const { dataset, error } = useDataset(inboxIri);
-
+    // const base = loggedIn ? session.info.webId.slice(0, session.info.webId.length - "profile/card#me".length) : "";
+    const base = "https://chris-sarli.inrupt.net/smail/chris.sarl/test/"
+    const inboxIri = base + "dir/inbox/";
+    const outboxIri = base + "dir/outbox/";
+    let currentView = "";
 
     return (
         <div className="app-container">
@@ -33,8 +32,8 @@ function AppContainer({ children }) {
                         <h1 className="nav-title">Smail</h1>
                         <Link to="/compose"><button className="compose-button" disabled={!session.info.isLoggedIn}>Compose</button></Link>
                         <ul className={'nav-items ' + (!session.info.isLoggedIn ? 'disabled' : '')}>
-                            <li><Link to="/">Inbox</Link></li>
-                            <li>Archive</li>
+                            <Link to="/" onClick={() => { currentView = "inbox" }}><li>Inbox</li></Link>
+                            <Link to="/dir/archive"><li>Archive</li></Link>
                             <li>Drafts</li>
                             <li>Sent</li>
                         </ul>
@@ -90,7 +89,16 @@ function AppContainer({ children }) {
                                 <Composer session={session} outboxIri={outboxIri}></Composer>
                             }></Route>
                             <Route path="/" element={
-                                <DirListComponent dir_url="https://chris-sarli.inrupt.net/smail/inbox/" session={session} />
+                                <Navigate to="/dir/inbox" />
+                            }></Route>
+                            {/* <Route path="/dir/*" element={
+                                <DirListComponent dirs_url={base + "dir/"} dir={window.location.pathname.slice("/dir/".length)} session={session} />
+                            }></Route> */}
+                            <Route path="/dir/inbox" element={
+                                <DirListComponent key="inbox" dirs_url={base + "dir/"} dir="inbox" session={session} />
+                            }></Route>
+                            <Route path="/dir/archive" element={
+                                <DirListComponent key="archive" dirs_url={base + "dir/"} dir="archive" session={session} />
                             }></Route>
                         </Routes>
                     }
