@@ -13,13 +13,17 @@ function getSubject(url, fs) {
 }
 
 function formatAddresses(from) {
-    if (from != undefined) {
-        from = JSON.parse(from)
-        return from.map(x => {
-            return formatSingleFrom(x)
-        }).join(", ")
+    try {
+        if (from != undefined) {
+            from = JSON.parse(from)
+            return from.map(x => {
+                return formatSingleFrom(x)
+            }).join(", ")
+        }
+        return ""
+    } catch (error) {
+        return "";
     }
-    return ""
 }
 
 function formatSingleFrom(from) {

@@ -1,0 +1,115 @@
+import {
+    getSolidDataset, getThing, getStringNoLocale, getThingAll, getDatetime, getSourceUrl, getInteger, createSolidDataset, addStringNoLocale, addUrl, createThing, setThing, saveSolidDatasetAt, setInteger, setStringNoLocale
+} from "@inrupt/solid-client";
+import { DatasetContext, SessionProvider, Table, TableColumn, ThingProvider, useThing, useSession, useDataset } from "@inrupt/solid-ui-react";
+import { useContext, Component } from "react";
+import MsgThing from "../MsgThing";
+import { SMAIL } from "../../SMAIL";
+import { Navigate } from 'react-router-dom';
+import { addMessageToDirIndex, updateDirIndex } from "../../util/message";
+const { RDF } = require("@inrupt/vocab-common-rdf");
+
+class Editor extends Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            session: props.session,
+            url: window.location.pathname.slice("/edit/".length),
+            message: {},
+            redirect: ''
+        }
+
+        getSolidDataset(this.state.url, { fetch: this.state.session.fetch }).then(dataset => {
+            const message_thing = getThingAll(dataset, this.state.url, { fetch: this.state.session.fetch })[0];
+            this.setState({
+                message: {
+                    subject: getStringNoLocale(message_thing, SMAIL.subject),
+                    from: getStringNoLocale(message_thing, SMAIL.from),
+                    to: getStringNoLocale(message_thing, SMAIL.to),
+                    timestamp: getInteger(message_thing, SMAIL.timestamp),
+                    body: getStringNoLocale(message_thing, SMAIL.body),
+                    messageId: getStringNoLocale(message_thing, SMAIL.messageId)
+                }
+            });
+        });
+    }
+
+    render() {
+        const handleUpdate = (field) => {
+            const message = this.state.message;
+            message[field] = document.getElementById(field + "_field").value;
+            this.setState({
+                message: message
+            })
+        }
+
+        const handleSubject = (e) => {
+            handleUpdate("subject");
+        }
+
+        const handleTo = (e) => {
+            handleUpdate("to");
+        }
+
+        const handleBody = (e) => {
+            handleUpdate("body");
+        }
+
+        const saveMessage = async () => {
+            let message_dataset = await getSolidDataset(this.state.url, this.state.session);
+            let message_thing = getThingAll(message_dataset, this.state.url, this.state.session)[0];
+
+            const timestamp = (new Date()).getTime();
+
+            message_thing = setStringNoLocale(message_thing, SMAIL.to, this.state.message['to']);
+            message_thing = setStringNoLocale(message_thing, SMAIL.subject, this.state.message['subject']);
+            message_thing = setStringNoLocale(message_thing, SMAIL.body, this.state.message['body']);
+            message_thing = setInteger(message_thing, SMAIL.timestamp, timestamp);
+
+            message_dataset = setThing(message_dataset, message_thing);
+
+            await saveSolidDatasetAt(this.state.url, message_dataset, { fetch: this.state.session.fetch });
+            await updateDirIndex("https://chris-sarli.inrupt.net/smail/chris.sarl/test/dir/drafts.json", this.state.url,
+                {
+                    'to': this.state.message['to'],
+                    'subject': this.state.message['subject'],
+                    'body': this.state.message['body'],
+                    'timestamp': this.state.message['timestamp']
+                }, this.state.session);
+        }
+
+        const sendMessage = async () => {
+            let newMsgUrl = this.state.base + "1";
+            let newMessageDataset = createSolidDataset();
+            let newMessage = createThing({ name: "1" });
+
+            newMessage = addStringNoLocale(newMessage, SMAIL.to, this.state.to);
+            newMessage = addStringNoLocale(newMessage, SMAIL.body, this.state.body);
+            newMessage = addStringNoLocale(newMessage, SMAIL.subject, this.state.subject);
+            newMessage = addUrl(newMessage, RDF.type, SMAIL.Message);
+            newMessageDataset = setThing(newMessageDataset, newMessage);
+            await saveSolidDatasetAt(newMsgUrl, newMessageDataset, { fetch: this.state.session.fetch }).catch(e => console.error(e));
+            this.setState({
+                redirect: <Navigate to="/" />
+            });
+        }
+
+        return <div className="messageView">
+            <div className="header">
+                <h2>Subject: <input id="subject_field" type="text" onChange={handleSubject} value={this.state.message['subject']}></input></h2>
+                <p><em>You</em> → <input id="to_field" type="text" onChange={handleTo} value={this.state.message['to']} /></p>
+            </div>
+            <div className="body">
+                <textarea id="body_field" type="text" onChange={handleBody} value={this.state.message['body']}></textarea>
+            </div>
+
+            <button onClick={saveMessage}>Save</button>
+            <button onClick={sendMessage}>Send</button>
+            {this.state.redirect}
+        </div>;
+    }
+}
+
+export default Editor;

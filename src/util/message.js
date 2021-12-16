@@ -25,7 +25,8 @@ export async function addMessageToDirIndex(message, message_thing, dir, session)
                     timestamp: getInteger(message_thing, SMAIL.timestamp),
                     is_read: getBoolean(message_thing, SMAIL.is_read),
                     subject: getStringNoLocale(message_thing, SMAIL.subject),
-                    from: getStringNoLocale(message_thing, SMAIL.from)
+                    from: getStringNoLocale(message_thing, SMAIL.from),
+                    to: getStringNoLocale(message_thing, SMAIL.to),
                 }
                 return overwriteFile(
                     dir,
@@ -53,6 +54,25 @@ export async function moveMessageToDir(message, dir, session) {
 export async function getMessageThing(messageUrl, session) {
     const dataset = await getSolidDataset(messageUrl, session);
     return getThingAll(dataset, messageUrl, session)[0];
+}
+
+export async function updateDirIndex(dir, message, updates, session) {
+    getFile(dir, session).then(blob => {
+        blob.text().then(async (text) => {
+            const contents = JSON.parse(text)['contents']
+            if (message in contents) {
+                const message_data = contents[message];
+                Object.keys(updates).forEach(key => {
+                    message_data[key] = updates[key];
+                });
+                contents[message] = message_data;
+            }
+            return overwriteFile(
+                dir,
+                Buffer.from(JSON.stringify({ contents: contents })),
+                { contentType: "application/json", fetch: session['fetch'] })
+        })
+    })
 }
 
 export async function deleteMessage(messageUrl, session) {

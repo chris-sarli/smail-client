@@ -34,6 +34,9 @@ class DirListComponent extends Component {
             messages: []
         }
 
+        this.editOnClick = props.editOnClick || false;
+        this.showRecipients = props.showRecipients || false;
+
         this.update_listings()
     }
 
@@ -52,6 +55,9 @@ class DirListComponent extends Component {
                 break;
             case "archive":
                 return this.state.dirs_url + "inbox.json"
+                break;
+            case "drafts":
+                return this.state.dirs_url + "outbox.json"
                 break;
             default:
                 break;
@@ -86,13 +92,13 @@ class DirListComponent extends Component {
             <div className="message-table">
                 <div className="msg-item-row header">
                     <div className="read-indicator"></div>
-                    <div className="from">From</div>
+                    <div className="from">{this.showRecipients ? "To" : "From"}</div>
                     <div className="subject">Subject</div>
-                    <div className="timestamp">Recieved</div>
+                    <div className="timestamp">{this.showRecipients ? "Last Edit" : "Recieved"}</div>
                     <div className="actions"></div>
                 </div>
                 {
-                    this.state.messages.map((pair) => <MessageItem url={pair[0]} move_dir={this.get_move_dir()} onDirChange={this.remove_message_from_list(pair[0])} onReadToggle={this.toggle_read(pair[0])} message_data={pair[1]} session={this.state.session} />)
+                    this.state.messages.map((pair) => <MessageItem url={pair[0]} move_dir={this.get_move_dir()} onDirChange={this.remove_message_from_list(pair[0])} onReadToggle={this.toggle_read(pair[0])} message_data={pair[1]} session={this.state.session} id_prefix={this.editOnClick ? "edit" : "messages"} showRecipients={this.showRecipients} />)
                     // JSON.stringify(this.state.messages)
                 }
             </div>

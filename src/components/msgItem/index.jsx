@@ -14,16 +14,19 @@ function getSubject(url, fs) {
 }
 
 function formatFrom(from) {
-    console.log("FROM", from);
-    if (from != undefined) {
-        if (typeof from == "string") {
-            from = JSON.parse(from)
+    try {
+        if (from != undefined) {
+            if (typeof from == "string") {
+                from = JSON.parse(from);
+            }
+            return from.map(x => {
+                return formatSingleFrom(x)
+            }).join(", ");
         }
-        return from.map(x => {
-            return formatSingleFrom(x)
-        }).join(", ")
+        return "";
+    } catch (error) {
+        return "";
     }
-    return ""
 }
 
 function formatSingleFrom(from) {
@@ -58,6 +61,9 @@ class MessageItem extends Component {
             data: props.message_data
         }
 
+        this.id_prefix = props.id_prefix || "messages"
+        this.showRecipients = props.showRecipients || false;
+
         // openMessage = () => {
         //     return <Redirect to={`/message/${this.state.url}`} />;
         // }
@@ -78,14 +84,16 @@ class MessageItem extends Component {
     get_move_dir_icon = () => {
         if (this.state.move_dir.endsWith("inbox.json")) {
             return "📥";
-        } else {
+        } else if (this.state.move_dir.endsWith("archive.json")) {
             return "🗄️";
+        } else {
+            return "📤";
         }
     }
 
     render() {
         console.log("data", this.state.data, this.state.data.from);
-        return <Link to={`/message/${this.state.url}`}>
+        return <Link to={`/${this.id_prefix}/${this.state.url}`}>
             <div className={"msg-item-row" + (!this.state.data.is_read ? " unread" : "")}>
                 <div className="read-indicator">
                     <button key={this.state.data.is_read} onClick={(e) => {
@@ -95,7 +103,7 @@ class MessageItem extends Component {
                         this.state.onReadToggle();
                     }}>{this.state.data.is_read ? "⚪" : "🔵"}</button>
                 </div>
-                <div className="from">{formatFrom(this.state.data.from)}</div>
+                <div className="from">{this.showRecipients ? this.state.data.to : formatFrom(this.state.data.from)}</div>
                 <div className="subject">{this.state.data.subject}</div>
                 <div className="timestamp">{formatTimestamp(this.state.data.timestamp)}</div>
                 <div className="actions">
