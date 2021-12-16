@@ -6,7 +6,7 @@ import { useContext, Component } from "react";
 import MsgThing from "../MsgThing";
 import { SMAIL } from "../../SMAIL";
 import { Navigate } from 'react-router-dom';
-import { addMessageToDirIndex, updateDirIndex } from "../../util/message";
+import { addMessageToDirIndex, moveMessageToDir, updateDirIndex } from "../../util/message";
 const { RDF } = require("@inrupt/vocab-common-rdf");
 
 class Editor extends Component {
@@ -81,19 +81,8 @@ class Editor extends Component {
         }
 
         const sendMessage = async () => {
-            let newMsgUrl = this.state.base + "1";
-            let newMessageDataset = createSolidDataset();
-            let newMessage = createThing({ name: "1" });
-
-            newMessage = addStringNoLocale(newMessage, SMAIL.to, this.state.to);
-            newMessage = addStringNoLocale(newMessage, SMAIL.body, this.state.body);
-            newMessage = addStringNoLocale(newMessage, SMAIL.subject, this.state.subject);
-            newMessage = addUrl(newMessage, RDF.type, SMAIL.Message);
-            newMessageDataset = setThing(newMessageDataset, newMessage);
-            await saveSolidDatasetAt(newMsgUrl, newMessageDataset, { fetch: this.state.session.fetch }).catch(e => console.error(e));
-            this.setState({
-                redirect: <Navigate to="/" />
-            });
+            await saveMessage();
+            await moveMessageToDir(this.state.url, "https://chris-sarli.inrupt.net/smail/chris.sarl/test/dir/outbox.json", this.state.session);
         }
 
         return <div className="messageView">
