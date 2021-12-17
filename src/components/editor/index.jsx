@@ -1,13 +1,9 @@
 import {
-    getSolidDataset, getThing, getStringNoLocale, getThingAll, getDatetime, getSourceUrl, getInteger, createSolidDataset, addStringNoLocale, addUrl, createThing, setThing, saveSolidDatasetAt, setInteger, setStringNoLocale
+    getSolidDataset, getStringNoLocale, getThingAll, getInteger, setThing, saveSolidDatasetAt, setInteger, setStringNoLocale
 } from "@inrupt/solid-client";
-import { DatasetContext, SessionProvider, Table, TableColumn, ThingProvider, useThing, useSession, useDataset } from "@inrupt/solid-ui-react";
-import { useContext, Component } from "react";
-import MsgThing from "../MsgThing";
+import { Component } from "react";
 import { SMAIL } from "../../SMAIL";
-import { Navigate } from 'react-router-dom';
-import { addMessageToDirIndex, moveMessageToDir, updateDirIndex } from "../../util/message";
-const { RDF } = require("@inrupt/vocab-common-rdf");
+import { moveMessageToDir, updateDirIndex } from "../../util/message";
 
 class Editor extends Component {
 
@@ -45,15 +41,15 @@ class Editor extends Component {
             })
         }
 
-        const handleSubject = (e) => {
+        const handleSubject = () => {
             handleUpdate("subject");
         }
 
-        const handleTo = (e) => {
+        const handleTo = () => {
             handleUpdate("to");
         }
 
-        const handleBody = (e) => {
+        const handleBody = () => {
             handleUpdate("body");
         }
 

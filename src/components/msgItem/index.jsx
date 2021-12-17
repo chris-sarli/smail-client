@@ -1,17 +1,7 @@
-import {
-    getSolidDataset, getThing, getStringNoLocale, getThingAll, getDatetime, getSourceUrl, getInteger
-} from "@inrupt/solid-client";
-import { DatasetContext, SessionProvider, Table, TableColumn, ThingProvider, useThing, useSession, useDataset } from "@inrupt/solid-ui-react";
-import { React, useContext, Component } from "react";
-import MsgThing from "../MsgThing";
-import { SMAIL } from "../../SMAIL";
+import { getSolidDataset } from "@inrupt/solid-client";
+import { React, Component } from "react";
 import { Link } from 'react-router-dom';
-import { deleteMessage, moveMessageToDir, toggleRead } from "../../util/message";
-
-function getSubject(url, fs) {
-    getSolidDataset(url, fs).then(m => console.log("m", m));
-    return true;
-}
+import { deleteMessage, moveMessageToDir, toggleRead, formatSingleFrom } from "../../util/message";
 
 function formatFrom(from) {
     try {
@@ -27,15 +17,6 @@ function formatFrom(from) {
     } catch (error) {
         return "";
     }
-}
-
-function formatSingleFrom(from) {
-    const addr = from['address'];
-    const name = from['name'];
-    if (name) {
-        return `${name} (${addr})`;
-    }
-    return addr;
 }
 
 function formatTimestamp(timestamp) {
@@ -61,24 +42,8 @@ class MessageItem extends Component {
             data: props.message_data
         }
 
-        this.id_prefix = props.id_prefix || "messages"
+        this.id_prefix = props.id_prefix || "message"
         this.showRecipients = props.showRecipients || false;
-
-        // openMessage = () => {
-        //     return <Redirect to={`/message/${this.state.url}`} />;
-        // }
-
-        // getSolidDataset(this.state.url, { fetch: this.state.session.fetch }).then(dataset => {
-        //     const message_thing = getThingAll(dataset, this.state.url, { fetch: this.state.session.fetch })[0];
-        //     this.setState({
-        //         data: {
-        //             subject: getStringNoLocale(message_thing, SMAIL.subject),
-        //             from: getStringNoLocale(message_thing, SMAIL.from),
-        //             timestamp: getInteger(message_thing, SMAIL.timestamp)
-        //         }
-        //     });
-        // });
-
     }
 
     get_move_dir_icon = () => {
@@ -103,16 +68,17 @@ class MessageItem extends Component {
                         this.state.onReadToggle();
                     }}>{this.state.data.is_read ? "⚪" : "🔵"}</button>
                 </div>
-                <div className="from">{this.showRecipients ? this.state.data.to : formatFrom(this.state.data.from)}</div>
-                <div className="subject">{this.state.data.subject}</div>
+                <div className="from">{this.showRecipients ? this.state.data.to || <em>No Recipients</em> : formatFrom(this.state.data.from)}</div>
+                <div className="subject">{this.state.data.subject || <em>No Subject</em>}</div>
                 <div className="timestamp">{formatTimestamp(this.state.data.timestamp)}</div>
                 <div className="actions">
-                    <button onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        moveMessageToDir(this.state.url, this.state.move_dir, this.state.session);
-                        this.state.onDirChange();
-                    }}>{this.get_move_dir_icon()}</button>
+                    {(this.state.move_dir != false) &&
+                        <button onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            moveMessageToDir(this.state.url, this.state.move_dir, this.state.session);
+                            this.state.onDirChange();
+                        }}>{this.get_move_dir_icon()}</button>}
                     <button onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();

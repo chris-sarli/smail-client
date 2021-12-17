@@ -1,7 +1,7 @@
 
-import { useSession, SessionProvider, LoginButton, LogoutButton, LinkButton, useDataset, DatasetProvider } from "@inrupt/solid-ui-react";
-import { getThingAll, getFile, getStringNoLocale, getThing, getSolidDataset, createThing, addStringNoLocale, createSolidDataset, addInteger, addBoolean, setThing, saveSolidDatasetAt } from "@inrupt/solid-client";
-import { useState, useEffect } from "react";
+import { useSession, LoginButton, LogoutButton } from "@inrupt/solid-ui-react";
+import { createThing, addStringNoLocale, createSolidDataset, addInteger, addBoolean, setThing, saveSolidDatasetAt } from "@inrupt/solid-client";
+import { useState } from "react";
 import DirListComponent from "../dirList";
 import { BrowserRouter, Route, Routes, Link, Navigate } from 'react-router-dom';
 import MessageView from "../messageView";
@@ -43,16 +43,12 @@ async function newMessage(baseUrl, session, replyingTo = undefined) {
 /* eslint react/prop-types: 0 */
 function AppContainer({ children }) {
 
-    const [idp, setIdp] = useState("https://inrupt.net");
-    // const [currentUrl, setCurrentUrl] = useState("http://localhost:3000");
-    const { session, sessionRequestInProgress, fetch } = useSession();
-    const us = useSession();
+    const [idp, _] = useState("https://inrupt.net");
+    const { session, sessionRequestInProgress } = useSession();
 
     const loggedIn = session.info.isLoggedIn;
 
-    // const base = loggedIn ? session.info.webId.slice(0, session.info.webId.length - "profile/card#me".length) : "";
     const base = "https://chris-sarli.inrupt.net/smail/chris.sarl/test/"
-    let currentView = "";
 
     return (
         <div className="app-container">
@@ -62,15 +58,14 @@ function AppContainer({ children }) {
                         <h1 className="nav-title">Smail</h1>
                         <button className="compose-button" disabled={!session.info.isLoggedIn} onClick={() => newMessage(base, session)}>Compose</button>
                         <ul className={'nav-items ' + (!session.info.isLoggedIn ? 'disabled' : '')}>
-                            <Link to="/" onClick={() => { currentView = "inbox" }}><li>Inbox</li></Link>
+                            <Link to="/"><li>Inbox</li></Link>
                             <Link to="/dir/archive"><li>Archive</li></Link>
                             <Link to="/dir/drafts"><li>Drafts</li></Link>
-                            <li>Sent</li>
+                            <Link to="/dir/sent"><li>Sent</li></Link>
                         </ul>
                     </div>
                     <div className="account">
                         {sessionRequestInProgress && <em>Logging in...</em>}
-
                         {!sessionRequestInProgress && session.info.isLoggedIn && (
                             <div>
                                 <div className="lia">
@@ -96,7 +91,6 @@ function AppContainer({ children }) {
                 </div>
                 <div className="main">
                     {!sessionRequestInProgress && !loggedIn &&
-
                         <div className="main-login-message">
                             Please log in to a Solid Pod to use this Smail client.
                             <br />
@@ -108,7 +102,6 @@ function AppContainer({ children }) {
                                 onError={console.error}
                             />
                         </div>
-
                     }
                     {!sessionRequestInProgress && loggedIn &&
                         <Routes>
@@ -121,9 +114,6 @@ function AppContainer({ children }) {
                             <Route path="/" element={
                                 <Navigate to="/dir/inbox" />
                             }></Route>
-                            {/* <Route path="/dir/*" element={
-                                <DirListComponent dirs_url={base + "dir/"} dir={window.location.pathname.slice("/dir/".length)} session={session} />
-                            }></Route> */}
                             <Route path="/dir/inbox" element={
                                 <DirListComponent key="inbox" dirs_url={base + "dir/"} dir="inbox" session={session} />
                             }></Route>
@@ -132,6 +122,9 @@ function AppContainer({ children }) {
                             }></Route>
                             <Route path="/dir/drafts" element={
                                 <DirListComponent key="drafts" dirs_url={base + "dir/"} dir="drafts" editOnClick={true} showRecipients={true} session={session} />
+                            }></Route>
+                            <Route path="/dir/sent" element={
+                                <DirListComponent key="sent" dirs_url={base + "dir/"} dir="sent" editOnClick={false} showRecipients={true} session={session} />
                             }></Route>
                         </Routes>
                     }

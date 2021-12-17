@@ -1,6 +1,5 @@
 import { deleteSolidDataset, getSolidDataset, getThingAll, getStringNoLocale, getFile, overwriteFile, setStringNoLocale, getBoolean, getInteger, setThing, saveSolidDatasetAt, setBoolean } from "@inrupt/solid-client";
 import { SMAIL } from "../SMAIL";
-import MsgThing from "../components/MsgThing";
 
 export async function removeMessageFromDir(message, dir, session) {
     const blob = await getFile(dir, session);
@@ -108,4 +107,13 @@ export async function toggleRead(message, session) {
                 }
             })
     ]);
+}
+
+export function formatSingleFrom(from) {
+    const addr = from['address'];
+    const name = from['name'];
+    if (name) {
+        return `${name} (${addr})`;
+    }
+    return addr;
 }

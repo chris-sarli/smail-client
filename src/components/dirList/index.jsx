@@ -1,26 +1,6 @@
-import {
-    getSolidDataset, getThing, getStringNoLocale, getThingAll, getDatetime, getSourceUrl, getInteger, getFile
-} from "@inrupt/solid-client";
-import { DatasetContext, SessionProvider, Table, TableColumn, ThingProvider, useThing, useSession, useDataset } from "@inrupt/solid-ui-react";
-import { useContext, Component } from "react";
-import { SMAIL } from "../../SMAIL";
+import { getFile } from "@inrupt/solid-client";
+import { Component } from "react";
 import MessageItem from "../msgItem";
-
-function getSubject(url, fs) {
-    getSolidDataset(url, fs).then(m => console.log("m", m));
-    return true;
-}
-
-function getMessageUrls(dir_url, session) {
-    return getSolidDataset(dir_url, { fetch: session.fetch }).then(d => Object.keys(d['graphs']['default']).slice(1));
-}
-
-async function getMessageTimestamp(msg_url, session) {
-    const dataset = await getSolidDataset(msg_url, { fetch: session.fetch });
-    const message_thing = getThingAll(dataset, msg_url, { fetch: session.fetch })[0];
-    return getInteger(message_thing, SMAIL.timestamp);
-}
-
 class DirListComponent extends Component {
 
     constructor(props) {
@@ -37,13 +17,13 @@ class DirListComponent extends Component {
         this.editOnClick = props.editOnClick || false;
         this.showRecipients = props.showRecipients || false;
 
-        this.update_listings()
+        this.update_listings();
     }
 
     update_listings = () => {
         getFile(this.state['dir_url'], this.state['session']).then(blob => {
             blob.text().then(text => {
-                this.setState({ messages: Object.entries(JSON.parse(text)["contents"]).sort((a, b) => b[1]['timestamp'] - a[1]['timestamp']) })
+                this.setState({ messages: Object.entries(JSON.parse(text)["contents"]).sort((a, b) => b[1]['timestamp'] - a[1]['timestamp']) });
             })
         })
     }
@@ -51,14 +31,13 @@ class DirListComponent extends Component {
     get_move_dir = () => {
         switch (this.state.dir) {
             case "inbox":
-                return this.state.dirs_url + "archive.json"
-                break;
+                return this.state.dirs_url + "archive.json";
             case "archive":
-                return this.state.dirs_url + "inbox.json"
-                break;
+                return this.state.dirs_url + "inbox.json";
             case "drafts":
-                return this.state.dirs_url + "outbox.json"
-                break;
+                return this.state.dirs_url + "outbox.json";
+            case "sent":
+                return false;
             default:
                 break;
         }
@@ -98,8 +77,7 @@ class DirListComponent extends Component {
                     <div className="actions"></div>
                 </div>
                 {
-                    this.state.messages.map((pair) => <MessageItem url={pair[0]} move_dir={this.get_move_dir()} onDirChange={this.remove_message_from_list(pair[0])} onReadToggle={this.toggle_read(pair[0])} message_data={pair[1]} session={this.state.session} id_prefix={this.editOnClick ? "edit" : "messages"} showRecipients={this.showRecipients} />)
-                    // JSON.stringify(this.state.messages)
+                    this.state.messages.map((pair) => <MessageItem url={pair[0]} move_dir={this.get_move_dir()} onDirChange={this.remove_message_from_list(pair[0])} onReadToggle={this.toggle_read(pair[0])} message_data={pair[1]} session={this.state.session} id_prefix={this.editOnClick ? "edit" : "message"} showRecipients={this.showRecipients} />)
                 }
             </div>
             <div className="status-bar">

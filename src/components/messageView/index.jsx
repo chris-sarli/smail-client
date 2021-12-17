@@ -1,16 +1,9 @@
 import {
-    getSolidDataset, getThing, getStringNoLocale, getThingAll, getDatetime, getSourceUrl, getInteger
+    getSolidDataset, getStringNoLocale, getThingAll, getInteger
 } from "@inrupt/solid-client";
-import { DatasetContext, SessionProvider, Table, TableColumn, ThingProvider, useThing, useSession, useDataset } from "@inrupt/solid-ui-react";
-import { useContext, Component } from "react";
-import MsgThing from "../MsgThing";
+import { Component } from "react";
 import { SMAIL } from "../../SMAIL";
-import { Link } from 'react-router-dom';
-
-function getSubject(url, fs) {
-    getSolidDataset(url, fs).then(m => console.log("m", m));
-    return true;
-}
+import { formatSingleFrom } from "../../util/message";
 
 function formatAddresses(from) {
     try {
@@ -22,24 +15,15 @@ function formatAddresses(from) {
         }
         return ""
     } catch (error) {
-        return "";
+        return from;
     }
 }
 
-function formatSingleFrom(from) {
-    const addr = from['address'];
-    const name = from['name'];
-    if (name) {
-        return `${name} (${addr})`;
-    }
-    return addr;
-}
 
 function formatTimestamp(timestamp) {
     const dt = new Date(timestamp);
     return dt.toLocaleString([], { hour: '2-digit', minute: '2-digit' });
 }
-
 
 class MessageView extends Component {
 
